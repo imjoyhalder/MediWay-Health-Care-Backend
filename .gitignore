@@ -51,3 +51,5 @@ coverage/
 /generated/prisma
 
 .vercel
+
+/generated/prisma
