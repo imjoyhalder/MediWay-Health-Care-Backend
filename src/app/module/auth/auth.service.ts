@@ -1,4 +1,5 @@
 // import { prisma } from '../../lib/prisma';
+import { UserStatus } from '../../../generated/prisma/enums';
 import { auth } from './../../lib/auth';
 
 
@@ -40,10 +41,18 @@ const loginPatient = async (payload: ILoginPatientPayload) => {
             password: payload.password,
         }
     })
-    if(!data.user) {
+    if (data.user.status === UserStatus.BLOCKED) {
+        throw new Error("Your account has been blocked. Please contact support.")
+    }
+    
+    if (data.user.isDeleted || data.user.status === UserStatus.DELETED) {
+        throw new Error("Your account has been deleted.")
+    }
+
+    if (!data.user) {
         throw new Error("Invalid email or password")
-    } 
-    return data 
+    }
+    return data
 }
 
 export const AuthService = {
