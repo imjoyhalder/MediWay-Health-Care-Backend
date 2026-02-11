@@ -22,10 +22,10 @@ const createSpecialty = async (req: Request, res: Response) => {
     }
 }
 
-const getAllSpecialty = async (req: Request, res: Response) => {        
+const getAllSpecialty = async (req: Request, res: Response) => {
     try {
         const result = await SpecialtyService.getAllSpecialty()
-        res.json({                  
+        res.json({
             success: true,
             message: "Specialties retrieved successfully",
             data: result
@@ -42,25 +42,46 @@ const getAllSpecialty = async (req: Request, res: Response) => {
 
 const deleteSpecialty = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params               
+        const { id } = req.params
         const result = await SpecialtyService.deleteSpecialty(id as string)
-        res.json({                  
-            success: true,                  
+        res.json({
+            success: true,
             message: "Specialty deleted successfully",
             data: result
         })
     } catch (error: any) {
         console.log(error);
-        res.status(500).json({          
+        res.status(500).json({
             success: false,
             message: "Failed to delete specialty",
             error: error.message
         })
-    }       
+    }
 }
 
-export const SpecialtyController = {
-    createSpecialty, 
-    getAllSpecialty,
-    deleteSpecialty
+const updateSpecialty = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params
+        const payload = req.body
+        const result = await SpecialtyService.updateSpecialty(id as string, payload)
+        res.json({
+            success: true,
+            message: "Specialty updated successfully",
+            data: result
+        })
+    } catch (error: any) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update specialty",
+            error: error.message
+        })
+    }
 }
+
+    export const SpecialtyController = {
+        createSpecialty,
+        getAllSpecialty,
+        deleteSpecialty, 
+        updateSpecialty
+    }
