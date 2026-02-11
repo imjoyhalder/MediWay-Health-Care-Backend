@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import { prisma } from "./app/lib/prisma";
 import { IndexRoutes } from "./app/routes";
+import path from "node:path";
 
 
 const app: Application = express();
@@ -16,17 +17,14 @@ app.use('/api/v1', IndexRoutes)
 
 // Basic route
 app.get('/', async (req: Request, res: Response) => {
-
-    const specialty = await prisma.specialty.create({
-        data: {
-            title: 'Cardiology'
-        }
-    })
-    res.status(201).json({
+    res.status(200).json({
         success: true,
         message: 'API is working',
-        data: specialty
-    })
+        method: req.method,
+        path: req.originalUrl,
+        query: req.query,
+    });
 });
+
 
 export default app;
