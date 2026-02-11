@@ -8,6 +8,11 @@ interface IRegisterPatientPayload {
     password: string;
 }
 
+interface ILoginPatientPayload {
+    email: string;
+    password: string;
+}
+
 const registerPatient = async (payload: IRegisterPatientPayload) => {
 
     const data = await auth.api.signUpEmail({
@@ -28,6 +33,20 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
     return data
 }
 
+const loginPatient = async (payload: ILoginPatientPayload) => {
+    const data = await auth.api.signInEmail({
+        body: {
+            email: payload.email,
+            password: payload.password,
+        }
+    })
+    if(!data.user) {
+        throw new Error("Invalid email or password")
+    } 
+    return data 
+}
+
 export const AuthService = {
-    registerPatient
+    registerPatient,
+    loginPatient
 }

@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from "express";
-import { prisma } from "./app/lib/prisma";
+// import { prisma } from "./app/lib/prisma";
 import { IndexRoutes } from "./app/routes";
-import path from "node:path";
+
 
 
 const app: Application = express();
