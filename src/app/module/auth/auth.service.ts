@@ -1,5 +1,6 @@
 // import { prisma } from '../../lib/prisma';
 import { UserStatus } from '../../../generated/prisma/enums';
+import { prisma } from '../../lib/prisma';
 import { auth } from './../../lib/auth';
 
 
@@ -28,10 +29,17 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
         throw new Error("Failed to register patient")
     }
 
-    //     const patient = await prisma.$transaction(async(tx)=>{
-
-    //     })
-    return data
+    const patient = await prisma.$transaction(async (tx) => {
+        const createdPatient = await tx.patient.create({
+            data: {
+                userId: data.user.id,
+                name: payload.name,
+                email: payload.email
+            }
+        })
+        return createdPatient
+    })
+    return { ...data, patient: patient }
 }
 
 const loginPatient = async (payload: ILoginPatientPayload) => {
@@ -44,7 +52,7 @@ const loginPatient = async (payload: ILoginPatientPayload) => {
     if (data.user.status === UserStatus.BLOCKED) {
         throw new Error("Your account has been blocked. Please contact support.")
     }
-    
+
     if (data.user.isDeleted || data.user.status === UserStatus.DELETED) {
         throw new Error("Your account has been deleted.")
     }
