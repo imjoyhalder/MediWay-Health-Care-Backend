@@ -62,5 +62,5 @@ export const DoctorController = {
     getAllDoctors,
     getDoctorById,
     updateDoctor,
-    deleteDoctor
+    deleteDoctor,
 }
