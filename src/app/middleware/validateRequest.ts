@@ -9,7 +9,7 @@ export const validateRequest = (zodSchema: z.ZodObject) => {
         if (!parseResult.success) {
             next(parseResult.error)
         }
-
+        console.log(parseResult);
         // sanitizing the data 
         req.body = parseResult.data
         console.log(req.body, "After zod validation");
