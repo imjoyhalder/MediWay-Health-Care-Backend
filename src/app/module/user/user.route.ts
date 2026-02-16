@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response, Router } from "express";
+
 import { UserController } from "./user.controller";
 import * as z from "zod";
 import { Gender } from "../../../generated/prisma/enums";
-import app from "../../../app";
-import { de } from "zod/locales";
+import { Router } from "express";
+import { validateRequest } from "../../middleware/validateRequest";
+
 
 const createDoctorZodSchema = z.object({
     password: z.string("Password is required").min(6, 'Password must be at least 6 characters').max(50, 'Password must be at most 50 characters'),
@@ -23,23 +24,15 @@ const createDoctorZodSchema = z.object({
     specialties: z.array(z.uuid("Specialty is required").min(1, 'At least one specialty is required'))
 })
 
+
+
 const router = Router();
 
-router.post('/create-doctor', (req: Request, res: Response, next: NextFunction) => {
 
-    console.log(req.body,"Before Zod Validation" );
 
-    const parseResult = createDoctorZodSchema.safeParse(req.body)
-    if(!parseResult.success) {
-        next(parseResult.error)
-    }
 
-    // sanitizing the data 
-    req.body = parseResult.data 
-    console.log(req.body , "After zod validation");
-    next();
+router.post('/create-doctor', validateRequest(createDoctorZodSchema), UserController.createDoctor)
 
-}, UserController.createDoctor)
 // router.post('/create-admin', UserController.createDoctor)
 // router.post('/create-super-admin', UserController.createDoctor)
 
