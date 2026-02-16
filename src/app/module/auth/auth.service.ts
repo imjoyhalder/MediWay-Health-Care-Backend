@@ -1,9 +1,10 @@
+import { status } from 'http-status';
 // import { prisma } from '../../lib/prisma';
-import status from 'http-status';
 import { UserStatus } from '../../../generated/prisma/enums';
 import AppError from '../../errorHelpers/AppError';
 import { prisma } from '../../lib/prisma';
 import { auth } from './../../lib/auth';
+import { tokenUtils } from '../../utils/token';
 
 
 interface IRegisterPatientPayload {
@@ -50,7 +51,7 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
                 id: data.user.id
             }
         })
-        throw new AppError(status.INTERNAL_SERVER_ERROR,"Failed to create patient profile")
+        throw new AppError(status.INTERNAL_SERVER_ERROR, "Failed to create patient profile")
     }
 }
 
@@ -72,7 +73,32 @@ const loginPatient = async (payload: ILoginPatientPayload) => {
     if (!data.user) {
         throw new AppError(status.BAD_REQUEST, "Invalid email or password")
     }
-    return data
+
+    const accessToken = tokenUtils.getAccessToken({
+        userId: data.user.id,
+        role: data.user.role,
+        email: data.user.email,
+        name: data.user.name,
+        status: data.user.status,
+        isDeleted: data.user.isDeleted,
+        emailVerified: data.user.emailVerified
+    })
+
+    const refreshToken = tokenUtils.getRefreshToken({
+        userId: data.user.id,
+        role: data.user.role,
+        email: data.user.email,
+        name: data.user.name,
+        status: data.user.status,
+        isDeleted: data.user.isDeleted,
+        emailVerified: data.user.emailVerified
+    })
+
+    return {
+        ...data, 
+        accessToken, 
+        refreshToken
+    }
 }
 
 export const AuthService = {
