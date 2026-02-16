@@ -20,6 +20,7 @@ export const globalErrorHandler = (error: any, req: Request, res: Response, next
     let errorSource: TErrorSource[] = []
     let statusCode: number = status.INTERNAL_SERVER_ERROR
     let message: string = 'Internal Server Error';
+    let stack: string | undefined = undefined
 
     /* [
     {
@@ -44,12 +45,20 @@ export const globalErrorHandler = (error: any, req: Request, res: Response, next
         message = simplifiedError.message
         errorSource = [...simplifiedError.errorSource]
     }
+    else if(error instanceof Error){
+        statusCode = status.INTERNAL_SERVER_ERROR
+        message = error.message
+        stack = error.stack
+    }
 
     const errorResponse: TErrorResponse = {
+        
         success: false,
+        statusCode,
         message: message,
         errorSource,
         error: envVars.NODE_ENV === 'development' ? error : undefined,
+        stack: envVars.NODE_ENV === 'development' ? stack : undefined
     }   
 
     res.status(statusCode).json(errorResponse);

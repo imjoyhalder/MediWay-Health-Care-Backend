@@ -1,5 +1,7 @@
 // import { prisma } from '../../lib/prisma';
+import status from 'http-status';
 import { UserStatus } from '../../../generated/prisma/enums';
+import AppError from '../../errorHelpers/AppError';
 import { prisma } from '../../lib/prisma';
 import { auth } from './../../lib/auth';
 
@@ -26,7 +28,7 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
     })
 
     if (!data.user) {
-        throw new Error("Failed to register patient")
+        throw new AppError(status.BAD_REQUEST, "Failed to register patient")
     }
 
     try {
@@ -48,7 +50,7 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
                 id: data.user.id
             }
         })
-        throw new Error("Failed to create patient profile")
+        throw new AppError(status.INTERNAL_SERVER_ERROR,"Failed to create patient profile")
     }
 }
 
@@ -60,15 +62,15 @@ const loginPatient = async (payload: ILoginPatientPayload) => {
         }
     })
     if (data.user.status === UserStatus.BLOCKED) {
-        throw new Error("Your account has been blocked. Please contact support.")
+        throw new AppError(status.FORBIDDEN, "Your account has been blocked. Please contact support.")
     }
 
     if (data.user.isDeleted || data.user.status === UserStatus.DELETED) {
-        throw new Error("Your account has been deleted.")
+        throw new AppError(status.NOT_FOUND, "Your account has been deleted.")
     }
 
     if (!data.user) {
-        throw new Error("Invalid email or password")
+        throw new AppError(status.BAD_REQUEST, "Invalid email or password")
     }
     return data
 }
