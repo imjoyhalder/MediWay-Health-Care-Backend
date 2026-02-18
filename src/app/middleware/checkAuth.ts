@@ -13,7 +13,6 @@ import { prisma } from "../lib/prisma"
 export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-
         // Session Token Verification
         const sessionToken = cookieUtils.getCookie(req, 'better-auth.session_token');
 
