@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express"
 import { cookieUtils } from "../utils/cookie"
@@ -8,6 +9,20 @@ import { Role, UserStatus } from "../../generated/prisma/enums"
 import { envVars } from "../../config/env"
 import { prisma } from "../lib/prisma"
 
+declare global {
+    namespace Express {
+        interface Request {
+            user?: {
+                userId: string,
+                role: string,
+                email: string,
+                
+                // emailVerified: boolean,
+                // status: UserStatus
+            }
+        }
+    }
+}
 
 export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -63,6 +78,11 @@ export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Res
                     throw new AppError(status.FORBIDDEN, "You are not allowed to access this route")
                 }
 
+                req.user = {
+                    userId: user.id,
+                    role: user.role,
+                    email: user.email,
+                }
                 // return next()
             }
 

@@ -15,7 +15,7 @@ export interface ICreateDoctor {
         gender: Gender;
         appointmentFee: number;      
         qualification: string;       
-        currentWorkingPlace?: string
+        currentWorkingPlace: string
         designation: string;         
     };
     specialties: string[];
