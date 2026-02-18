@@ -188,39 +188,39 @@ const getNewToken = async (refreshToken: string, sessionToken: string) => {
     const data = verifiedRefreshToken.data as JwtPayload
 
     const newAccessToken = tokenUtils.getAccessToken({
-        userId: data.user.id,
-        role: data.user.role,
-        email: data.user.email,
-        name: data.user.name,
-        status: data.user.status,
-        isDeleted: data.user.isDeleted,
-        emailVerified: data.user.emailVerified
+        userId: data.userId,
+        role: data.role,
+        email: data.email,
+        name: data.name,
+        status: data.status,
+        isDeleted: data.isDeleted,
+        emailVerified: data.emailVerified
     })
 
     const newRefreshToken = tokenUtils.getRefreshToken({
-        userId: data.user.id,
-        role: data.user.role,
-        email: data.user.email,
-        name: data.user.name,
-        status: data.user.status,
-        isDeleted: data.user.isDeleted,
-        emailVerified: data.user.emailVerified
+        userId: data.userId,
+        role: data.role,
+        email: data.email,
+        name: data.name,
+        status: data.status,
+        isDeleted: data.isDeleted,
+        emailVerified: data.emailVerified
     })
 
-    const {token} = await prisma.session.update({
+    const { token } = await prisma.session.update({
         where: {
             token: sessionToken
         },
         data: {
             token: sessionToken,
-            expiresAt: new Date(Date.now() + 60 * 60 * 60 * 24 * 1000), 
+            expiresAt: new Date(Date.now() + 60 * 60 * 60 * 24 * 1000),
             updatedAt: new Date()
         }
     })
 
     return {
         accessToken: newAccessToken,
-        refreshToken: newRefreshToken, 
+        refreshToken: newRefreshToken,
         sessionToken: token
     }
 }
@@ -228,6 +228,6 @@ const getNewToken = async (refreshToken: string, sessionToken: string) => {
 export const AuthService = {
     registerPatient,
     loginPatient,
-    getMe, 
+    getMe,
     getNewToken
 }
