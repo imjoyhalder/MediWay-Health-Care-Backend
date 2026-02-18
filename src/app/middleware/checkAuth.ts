@@ -9,20 +9,6 @@ import { Role, UserStatus } from "../../generated/prisma/enums"
 import { envVars } from "../../config/env"
 import { prisma } from "../lib/prisma"
 
-declare global {
-    namespace Express {
-        interface Request {
-            user?: {
-                userId: string,
-                role: string,
-                email: string,
-                
-                // emailVerified: boolean,
-                // status: UserStatus
-            }
-        }
-    }
-}
 
 export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {

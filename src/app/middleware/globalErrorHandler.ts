@@ -23,21 +23,6 @@ export const globalErrorHandler = (error: any, req: Request, res: Response, next
     let message: string = 'Internal Server Error';
     let stack: string | undefined = undefined
 
-    /* [
-    {
-        expected: 'string',
-        code: 'invalid_type',
-        path: [ 'username' ],
-        message: 'Invalid input: expected string'
-    },
-    {
-        expected: 'number',
-        code: 'invalid_type',
-        path: [ 'xp' ],
-        message: 'Invalid input: expected number'
-    }
-    ] */
-
     if (error instanceof z.ZodError) {
 
         const simplifiedError = handleZodError(error)
