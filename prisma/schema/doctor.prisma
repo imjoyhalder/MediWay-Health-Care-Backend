@@ -1,5 +1,64 @@
+// model Doctor {
+//     id String @id @default(uuid(7))
+
+//     name          String
+//     email         String    @unique
+//     profilePhoto  String?
+//     contactNumber String?
+//     address       String?
+//     isDeleted     Boolean   @default(false)
+//     deletedAt     DateTime?
+
+//     registrationNumber  String @unique
+//     experience          Int    @default(0)
+//     gender              Gender
+//     appointmentFee      Float
+//     qualification       String
+//     currentWorkingPlace String
+//     designation         String
+//     averageRating       Float  @default(0.0)
+
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+
+//     //relations
+
+//     userId String @unique
+//     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+//     specialties     DoctorSpecialty[]
+//     appointments    Appointment[]
+//     prescriptions   Prescription[]
+//     reviews         Review[]
+//     doctorSchedules DoctorSchedules[]
+//     medicalReports  MedicalReport[]
+
+//     @@index([email], name: "idx_doctor_email")
+//     @@index([isDeleted], name: "idx_doctor_isDeleted")
+//     @@map("doctor")
+// }
+
+// model DoctorSchedules {
+//     id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//     doctorId   String   @db.Uuid
+//     scheduleId String   @db.Uuid
+//     isBooked   Boolean  @default(false)
+//     createdAt  DateTime @default(now())
+//     updatedAt  DateTime @updatedAt
+
+//     // Relations
+//     doctor   Doctor   @relation(fields: [doctorId], references: [id])
+//     schedule Schedule @relation(fields: [scheduleId], references: [id])
+
+//     // An appointment is associated with this specific doctor's schedule slot
+//     appointment Appointment?
+
+//     @@unique([doctorId, scheduleId])
+//     @@map("doctor_schedules")
+// }
+
 model Doctor {
-    id String @id @default(uuid())
+    id String @id @default(uuid(7))
 
     name          String
     email         String    @unique
@@ -9,48 +68,30 @@ model Doctor {
     isDeleted     Boolean   @default(false)
     deletedAt     DateTime?
 
-    registrationNumber  String  @unique
-    experience          Int     @default(0)
+    registrationNumber  String @unique
+    experience          Int    @default(0)
     gender              Gender
     appointmentFee      Float
     qualification       String
-    currentWorkingPlace String?
+    currentWorkingPlace String
     designation         String
-    averageRating       Float   @default(0.0)
+    averageRating       Float  @default(0.0)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    // Relations
-    userId          String            @unique
-    user            User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    //relations
+
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
     specialties     DoctorSpecialty[]
-    doctorSchedules DoctorSchedules[]
     appointments    Appointment[]
-    reviews         Review[]
-    medicalReports  MedicalReport[]
     prescriptions   Prescription[]
+    reviews         Review[]
+    doctorSchedules DoctorSchedules[]
 
     @@index([email], name: "idx_doctor_email")
     @@index([isDeleted], name: "idx_doctor_isDeleted")
     @@map("doctor")
-}
-
-model DoctorSchedules {
-    id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-    doctorId   String   @db.Uuid
-    scheduleId String   @db.Uuid
-    isBooked   Boolean  @default(false)
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-
-    // Relations
-    doctor   Doctor   @relation(fields: [doctorId], references: [id])
-    schedule Schedule @relation(fields: [scheduleId], references: [id])
-
-    // An appointment is associated with this specific doctor's schedule slot
-    appointment Appointment?
-
-    @@unique([doctorId, scheduleId])
-    @@map("doctor_schedules")
 }
