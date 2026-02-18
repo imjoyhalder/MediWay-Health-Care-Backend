@@ -1,11 +1,11 @@
 import { status } from 'http-status';
-// import { prisma } from '../../lib/prisma';
 import { UserStatus } from '../../../generated/prisma/enums';
 import AppError from '../../errorHelpers/AppError';
 import { prisma } from '../../lib/prisma';
 import { auth } from './../../lib/auth';
 import { tokenUtils } from '../../utils/token';
 import { IRequestUser } from '../../interfaces/requestUser.interface';
+
 
 
 
@@ -151,7 +151,8 @@ const getMe = async (user: IRequestUser) => {
                     reviews: true,
                     prescriptions: true
                 }
-            }
+            }, 
+            admin: true
         }
     })
     if (!isUserExist) {
