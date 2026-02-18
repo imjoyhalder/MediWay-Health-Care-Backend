@@ -186,7 +186,7 @@ const getNewToken = async (refreshToken: string, sessionToken: string) => {
     }
 
     const data = verifiedRefreshToken.data as JwtPayload
-    console.log(data);
+
     const newAccessToken = tokenUtils.getAccessToken({
         userId: data.userId,
         role: data.role,
