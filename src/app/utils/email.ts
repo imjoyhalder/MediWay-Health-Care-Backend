@@ -20,7 +20,7 @@ interface SendEmailOptions {
 }
 
 const transporter = nodemailer.createTransport({
-    host: envVars.EMAIL_SENDER_SMTP_PORT,
+    host: envVars.EMAIL_SENDER_SMTP_HOST,
     secure: true,
     auth: {
         user: envVars.EMAIL_SENDER_SMTP_USER,
