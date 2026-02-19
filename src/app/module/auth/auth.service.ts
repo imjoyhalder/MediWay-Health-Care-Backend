@@ -267,7 +267,7 @@ const changePassword = async (payload: IChangePasswordPayload, sessionToken: str
     }
 }
 
-const logoutUser = async(sessionToken: string) => {
+const logoutUser = async (sessionToken: string) => {
     const result = await auth.api.signOut({
         headers: new Headers({
             "Authorization": `Bearer ${sessionToken}`
@@ -276,7 +276,7 @@ const logoutUser = async(sessionToken: string) => {
     return result
 }
 
-const verifyEmail = async(email: string, otp: string)=>{
+const verifyEmail = async (email: string, otp: string) => {
     const result = await auth.api.verifyEmailOTP({
         body: {
             email,
@@ -284,11 +284,11 @@ const verifyEmail = async(email: string, otp: string)=>{
         }
     })
 
-    if(result.status && !result.user.emailVerified){
+    if (result.status && !result.user.emailVerified) {
         await prisma.user.update({
             where: {
                 email
-            }, 
+            },
             data: {
                 emailVerified: true
             }
@@ -296,12 +296,86 @@ const verifyEmail = async(email: string, otp: string)=>{
     }
 }
 
+const forgetPassword = async (email: string) => {
+    const isExistUser = await prisma.user.findUnique({
+        where: {
+            email
+        }
+    })
+
+    if (!isExistUser) {
+        throw new AppError(status.NOT_FOUND, "User not found")
+    }
+
+    if (isExistUser.status === UserStatus.BLOCKED) {
+        throw new AppError(status.FORBIDDEN, "Your account has been blocked. Please contact support.")
+    }
+
+    if (isExistUser.isDeleted || isExistUser.status === UserStatus.DELETED) {
+        throw new AppError(status.NOT_FOUND, "Your account has been deleted.")
+    }
+
+    if (!isExistUser?.emailVerified) {
+        throw new AppError(status.BAD_REQUEST, "Please verify your email address first.")
+    }
+
+    await auth.api.requestPasswordResetEmailOTP({
+        body: {
+            email
+        }
+    })
+
+}
+
+const resetPassword = async (email: string, otp: string, newPassword: string) => {
+    
+    const isExistUser = await prisma.user.findUnique({
+        where: {
+            email
+        }
+    })
+
+    if (!isExistUser) {
+        throw new AppError(status.NOT_FOUND, "User not found")
+    }
+
+    if (isExistUser.status === UserStatus.BLOCKED) {
+        throw new AppError(status.FORBIDDEN, "Your account has been blocked. Please contact support.")
+    }
+
+    if (isExistUser.isDeleted || isExistUser.status === UserStatus.DELETED) {
+        throw new AppError(status.NOT_FOUND, "Your account has been deleted.")
+    }
+
+    if (!isExistUser?.emailVerified) {
+        throw new AppError(status.BAD_REQUEST, "Please verify your email address first.")
+    }
+
+    await auth.api.resetPasswordEmailOTP({
+        body: {
+            email, 
+            otp: otp, 
+            password: newPassword
+        }
+    })
+
+    await prisma.session.deleteMany({
+        where: {
+            userId: isExistUser.id
+        }
+    })
+}
+
+
+
 export const AuthService = {
     registerPatient,
     loginPatient,
     getMe,
     getNewToken,
-    changePassword, 
-    logoutUser, 
-    verifyEmail
+    changePassword,
+    logoutUser,
+    verifyEmail,
+    forgetPassword,
+    resetPassword
 }
