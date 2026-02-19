@@ -8,20 +8,11 @@ import { IRequestUser } from '../../interfaces/requestUser.interface';
 import { jwtUtils } from '../../utils/jwt';
 import { envVars } from '../../../config/env';
 import { JwtPayload } from 'jsonwebtoken';
+import { IChangePasswordPayload, ILoginPatientPayload, IRegisterPatientPayload } from './auth.interface';
 
 
 
 
-interface IRegisterPatientPayload {
-    name: string;
-    email: string;
-    password: string;
-}
-
-interface ILoginPatientPayload {
-    email: string;
-    password: string;
-}
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
 
@@ -225,9 +216,37 @@ const getNewToken = async (refreshToken: string, sessionToken: string) => {
     }
 }
 
+const changePassword = async (payload: IChangePasswordPayload, sessionToken: string) => {
+    const session = await auth.api.getSession({
+        headers: new Headers({
+            "Authorization": `Bearer ${sessionToken}`
+        })
+    })
+
+    if (!session) {
+        throw new AppError(status.UNAUTHORIZED, "Invalid session token")
+    }
+
+    const {currentPassword, newPassword} = payload
+
+    const result = await auth.api.changePassword({
+        body: {
+            currentPassword,
+            newPassword, 
+            revokeOtherSessions: true 
+        }, 
+        headers: new Headers({
+            "Authorization": `Bearer ${sessionToken}`
+        })
+    })
+
+    return result; 
+}
+
 export const AuthService = {
     registerPatient,
     loginPatient,
     getMe,
-    getNewToken
+    getNewToken, 
+    changePassword
 }

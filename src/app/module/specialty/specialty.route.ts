@@ -14,9 +14,9 @@ import { checkAuth } from "../../middleware/checkAuth";
 
 const router = Router()
 
-router.post("/", checkAuth(Role.ADMIN, Role.SUPPER_ADMIN), SpecialtyController.createSpecialty)
-router.get("/", checkAuth(Role.ADMIN, Role.SUPPER_ADMIN, Role.DOCTOR), SpecialtyController.getAllSpecialty)
-router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPPER_ADMIN), SpecialtyController.deleteSpecialty)
-router.patch("/:id", checkAuth(Role.ADMIN, Role.SUPPER_ADMIN), SpecialtyController.updateSpecialty)
+router.post("/", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialtyController.createSpecialty)
+router.get("/", checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.DOCTOR), SpecialtyController.getAllSpecialty)
+router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialtyController.deleteSpecialty)
+router.patch("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialtyController.updateSpecialty)
 
 export const SpecialtyRoutes = router
