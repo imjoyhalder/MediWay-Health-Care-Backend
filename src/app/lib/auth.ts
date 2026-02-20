@@ -129,9 +129,9 @@ export const auth = betterAuth({
             maxAge: 60 * 60 * 60 * 24 // 1 day
         }
     }, 
-    // redirectURLs: {
-    //     signIn: envVars.FRONTEND_URL ? `${envVars.FRONTEND_URL}/signin` : undefined,
-    // }, 
+    redirectURLs: {
+        signIn: `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success`,
+    }, 
     advanced: {
         useSecureCookies: false, 
         cookies: {

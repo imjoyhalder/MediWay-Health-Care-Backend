@@ -9,7 +9,8 @@ import { jwtUtils } from '../../utils/jwt';
 import { envVars } from '../../../config/env';
 import { JwtPayload } from 'jsonwebtoken';
 import { IChangePasswordPayload, ILoginPatientPayload, IRegisterPatientPayload } from './auth.interface';
-import { catchAsync } from '../../shared/catchAsync';
+import { ISession } from '../../interfaces/session.interface';
+
 
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
@@ -386,7 +387,47 @@ const resetPassword = async (email: string, otp: string, newPassword: string) =>
     })
 }
 
-const googleLoginSuccess = async (req: Request, res: Response) => {}
+const googleLoginSuccess = async (session: ISession) => {
+    const isPatientExist = await prisma.patient.findUnique({
+        where: {
+            userId: session.user.id
+        }
+    })
+    if(!isPatientExist){
+        await prisma.patient.create({
+            data: {
+                userId: session.user.id,
+                name: session.user.name,
+                email: session.user.email
+            }
+        })
+    }
+
+    const accessToken = tokenUtils.getAccessToken({
+        userId: session.user.id,
+        role: session.user.role,
+        email: session.user.email,
+        name: session.user.name,
+        status: session.user.status,
+        isDeleted: session.user.isDeleted,
+        emailVerified: session.user.emailVerified
+    })
+
+    const refreshToken = tokenUtils.getRefreshToken({
+        userId: session.user.id,
+        role: session.user.role,
+        email: session.user.email,
+        name: session.user.name,
+        status: session.user.status,
+        isDeleted: session.user.isDeleted,
+        emailVerified: session.user.emailVerified
+    })
+
+    return {
+        accessToken,
+        refreshToken
+    }
+}
 
 
 
