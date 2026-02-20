@@ -9,9 +9,7 @@ import { jwtUtils } from '../../utils/jwt';
 import { envVars } from '../../../config/env';
 import { JwtPayload } from 'jsonwebtoken';
 import { IChangePasswordPayload, ILoginPatientPayload, IRegisterPatientPayload } from './auth.interface';
-
-
-
+import { catchAsync } from '../../shared/catchAsync';
 
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
@@ -370,12 +368,25 @@ const resetPassword = async (email: string, otp: string, newPassword: string) =>
         }
     })
 
+    if(isExistUser.needPasswordChange){
+        await prisma.user.update({
+            where: {
+                id: isExistUser.id
+            },
+            data: {
+                needPasswordChange: false
+            }
+        })
+    }
+
     await prisma.session.deleteMany({
         where: {
             userId: isExistUser.id
         }
     })
 }
+
+const googleLoginSuccess = async (req: Request, res: Response) => {}
 
 
 
@@ -388,5 +399,6 @@ export const AuthService = {
     logoutUser,
     verifyEmail,
     forgetPassword,
-    resetPassword
+    resetPassword, 
+    googleLoginSuccess
 }

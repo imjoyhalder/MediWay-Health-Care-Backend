@@ -4,11 +4,14 @@ import { prisma } from "./prisma";
 import { Role, UserStatus } from "../../generated/prisma/enums";
 import { bearer, emailOTP } from "better-auth/plugins";
 import { sendEmail } from "../utils/email";
+import { envVars } from "../../config/env";
 
 
 
 
 export const auth = betterAuth({
+    baseURL: envVars.BETTER_AUTH_URL,
+    secret: envVars.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
@@ -16,6 +19,23 @@ export const auth = betterAuth({
         enabled: true,
         requireEmailVerification: true
     },
+    socialProviders: {
+        google: {
+            clientId: envVars.GOOGLE_CLIENT_ID as string,
+            clientSecret: envVars.GOOGLE_CLIENT_SECRET as string,
+            // callbackUrl: envVars.GOOGLE_CALLBACK_URL as string, 
+            mapProfileToUser: ()=>{
+                return {
+                    role: Role.PATIENT, 
+                    status: UserStatus.ACTIVE,
+                    needPasswordChange: false,
+                    emailVerified: true,
+                    isDeleted: false,
+                    deletedAt: null
+                }
+            }
+        }
+    }, 
     emailVerification: {
         sendOnSignIn: true,
         sendOnSignUp: true,
@@ -107,6 +127,30 @@ export const auth = betterAuth({
         cookieCache: {
             enabled: true,
             maxAge: 60 * 60 * 60 * 24 // 1 day
+        }
+    }, 
+    // redirectURLs: {
+    //     signIn: envVars.FRONTEND_URL ? `${envVars.FRONTEND_URL}/signin` : undefined,
+    // }, 
+    advanced: {
+        useSecureCookies: false, 
+        cookies: {
+            state: {
+                attributes: {
+                    sameSite: "none", 
+                    secure: true, 
+                    httpOnly: true, 
+                    path: "/"
+                }
+            }, 
+            sessionToken : {
+                attributes: {
+                    sameSite: "none", 
+                    secure: true, 
+                    httpOnly: true, 
+                    path: "/"
+                }
+            }
         }
     }
 });
