@@ -9,7 +9,7 @@ import { jwtUtils } from '../../utils/jwt';
 import { envVars } from '../../../config/env';
 import { JwtPayload } from 'jsonwebtoken';
 import { IChangePasswordPayload, ILoginPatientPayload, IRegisterPatientPayload } from './auth.interface';
-import { ISession } from '../../interfaces/session.interface';
+// import { ISession } from '../../interfaces/session.interface';
 
 
 
@@ -239,7 +239,7 @@ const changePassword = async (payload: IChangePasswordPayload, sessionToken: str
         })
     })
 
-    if(session.user.needPasswordChange){
+    if (session.user.needPasswordChange) {
         await prisma.user.update({
             where: {
                 id: session.user.id
@@ -338,7 +338,7 @@ const forgetPassword = async (email: string) => {
 }
 
 const resetPassword = async (email: string, otp: string, newPassword: string) => {
-    
+
     const isExistUser = await prisma.user.findUnique({
         where: {
             email
@@ -363,13 +363,13 @@ const resetPassword = async (email: string, otp: string, newPassword: string) =>
 
     await auth.api.resetPasswordEmailOTP({
         body: {
-            email, 
-            otp: otp, 
+            email,
+            otp: otp,
             password: newPassword
         }
     })
 
-    if(isExistUser.needPasswordChange){
+    if (isExistUser.needPasswordChange) {
         await prisma.user.update({
             where: {
                 id: isExistUser.id
@@ -387,49 +387,84 @@ const resetPassword = async (email: string, otp: string, newPassword: string) =>
     })
 }
 
-const googleLoginSuccess = async (session: ISession) => {
-    const isPatientExist = await prisma.patient.findUnique({
-        where: {
-            userId: session.user.id
+// const googleLoginSuccess = async (session: ISession) => {
+//     const isPatientExist = await prisma.patient.findUnique({
+//         where: {
+//             userId: session.user.id
+//         }
+//     })
+//     if(!isPatientExist){
+//         await prisma.patient.create({
+//             data: {
+//                 userId: session.user.id,
+//                 name: session.user.name,
+//                 email: session.user.email
+//             }
+//         })
+//     }
+
+//     const accessToken = tokenUtils.getAccessToken({
+//         userId: session.user.id,
+//         role: session.user.role,
+//         email: session.user.email,
+//         name: session.user.name,
+//         status: session.user.status,
+//         isDeleted: session.user.isDeleted,
+//         emailVerified: session.user.emailVerified
+//     })
+
+//     const refreshToken = tokenUtils.getRefreshToken({
+//         userId: session.user.id,
+//         role: session.user.role,
+//         email: session.user.email,
+//         name: session.user.name,
+//         status: session.user.status,
+//         isDeleted: session.user.isDeleted,
+//         emailVerified: session.user.emailVerified
+//     })
+
+//     return {
+//         accessToken,
+//         refreshToken
+//     }
+// }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const googleLoginSuccess = async (session : Record<string, any>) =>{
+    const isPatientExists = await prisma.patient.findUnique({
+        where : {
+            userId : session.user.id,
         }
     })
-    if(!isPatientExist){
+
+    if(!isPatientExists){
         await prisma.patient.create({
-            data: {
-                userId: session.user.id,
-                name: session.user.name,
-                email: session.user.email
+            data : {
+                userId : session.user.id,
+                name : session.user.name,
+                email : session.user.email,
             }
+        
         })
     }
 
     const accessToken = tokenUtils.getAccessToken({
         userId: session.user.id,
         role: session.user.role,
-        email: session.user.email,
         name: session.user.name,
-        status: session.user.status,
-        isDeleted: session.user.isDeleted,
-        emailVerified: session.user.emailVerified
-    })
+    });
 
     const refreshToken = tokenUtils.getRefreshToken({
         userId: session.user.id,
         role: session.user.role,
-        email: session.user.email,
         name: session.user.name,
-        status: session.user.status,
-        isDeleted: session.user.isDeleted,
-        emailVerified: session.user.emailVerified
-    })
+    });
 
     return {
         accessToken,
-        refreshToken
+        refreshToken,
     }
 }
-
-
 
 export const AuthService = {
     registerPatient,
@@ -440,6 +475,6 @@ export const AuthService = {
     logoutUser,
     verifyEmail,
     forgetPassword,
-    resetPassword, 
+    resetPassword,
     googleLoginSuccess
 }

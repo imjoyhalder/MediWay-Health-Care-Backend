@@ -24,9 +24,9 @@ export const auth = betterAuth({
             clientId: envVars.GOOGLE_CLIENT_ID as string,
             clientSecret: envVars.GOOGLE_CLIENT_SECRET as string,
             // callbackUrl: envVars.GOOGLE_CALLBACK_URL as string, 
-            mapProfileToUser: ()=>{
+            mapProfileToUser: () => {
                 return {
-                    role: Role.PATIENT, 
+                    role: Role.PATIENT,
                     status: UserStatus.ACTIVE,
                     needPasswordChange: false,
                     emailVerified: true,
@@ -35,7 +35,7 @@ export const auth = betterAuth({
                 }
             }
         }
-    }, 
+    },
     emailVerification: {
         sendOnSignIn: true,
         sendOnSignUp: true,
@@ -128,26 +128,33 @@ export const auth = betterAuth({
             enabled: true,
             maxAge: 60 * 60 * 60 * 24 // 1 day
         }
-    }, 
+    },
     redirectURLs: {
         signIn: `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success`,
-    }, 
+    },
+    trustedOrigins: [
+        envVars.BETTER_AUTH_URL as string,
+        envVars.FRONTEND_URL as string,
+        'http://localhost:3000',
+        'http://localhost:5000'
+    ]
+    ,
     advanced: {
-        useSecureCookies: false, 
+        useSecureCookies: false,
         cookies: {
             state: {
                 attributes: {
-                    sameSite: "none", 
-                    secure: true, 
-                    httpOnly: true, 
+                    sameSite: "none",
+                    secure: true,
+                    httpOnly: true,
                     path: "/"
                 }
-            }, 
-            sessionToken : {
+            },
+            sessionToken: {
                 attributes: {
-                    sameSite: "none", 
-                    secure: true, 
-                    httpOnly: true, 
+                    sameSite: "none",
+                    secure: true,
+                    httpOnly: true,
                     path: "/"
                 }
             }
