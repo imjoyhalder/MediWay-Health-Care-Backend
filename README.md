@@ -5,7 +5,7 @@ A **production-grade healthcare management system backend** built with modern te
 MediWay Health Care enables **patients**, **doctors**, and **administrators** to interact through a robust RESTful API covering authentication, appointments, prescriptions, payments, and medical data management.
 
 ---
-## Requirement Link - https://github.com/Apollo-Level2-Web-Dev/L2B6-Backend-PH-Healthcare-Management-System/blob/part-2/Tasks/Task-1.md
+
 
 ## 🚀 Project Overview
 
