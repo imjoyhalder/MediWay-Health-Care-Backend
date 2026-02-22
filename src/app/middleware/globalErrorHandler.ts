@@ -7,15 +7,25 @@ import * as z from 'zod'
 import { TErrorResponse, TErrorSource } from "../interfaces/error.interface";
 import { handleZodError } from "../errorHelpers/handleZodError";
 import AppError from "../errorHelpers/AppError";
+import { deleteFileFromCloudinary } from "../../config/cloudinary.config";
 
 
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const globalErrorHandler = (error: any, req: Request, res: Response, next: NextFunction) => {
+export const globalErrorHandler = async(error: any, req: Request, res: Response, next: NextFunction) => {
 
     if (envVars.NODE_ENV === 'development') {
         console.error('Error From Global Error Handler:', error);
+    }
+
+    if (req.file) {
+        await deleteFileFromCloudinary(req.file.path)
+    }
+
+    if(req.files && Array.isArray(req.files) && req.files.length > 0){
+        const imageUrls = req.files.map((file)=>file.path); 
+        await Promise.all(imageUrls.map(async (url)=> deleteFileFromCloudinary(url)))
     }
 
     let errorSource: TErrorSource[] = []
@@ -27,13 +37,13 @@ export const globalErrorHandler = (error: any, req: Request, res: Response, next
 
         const simplifiedError = handleZodError(error)
 
-        statusCode = simplifiedError.statusCode  as number
+        statusCode = simplifiedError.statusCode as number
         message = simplifiedError.message
         errorSource = [...simplifiedError.errorSource]
     }
-    else if(error instanceof AppError){
+    else if (error instanceof AppError) {
         statusCode = error.statusCode
-        message = error.message 
+        message = error.message
         stack = error.stack
         errorSource = [
             {
@@ -42,7 +52,7 @@ export const globalErrorHandler = (error: any, req: Request, res: Response, next
             }
         ]
     }
-    else if(error instanceof Error){
+    else if (error instanceof Error) {
         statusCode = status.INTERNAL_SERVER_ERROR
         message = error.message
         stack = error.stack
@@ -55,14 +65,14 @@ export const globalErrorHandler = (error: any, req: Request, res: Response, next
     }
 
     const errorResponse: TErrorResponse = {
-        
+
         success: false,
         statusCode,
         message: message,
         errorSource,
         error: envVars.NODE_ENV === 'development' ? error : undefined,
         stack: envVars.NODE_ENV === 'development' ? stack : undefined
-    }   
+    }
 
     res.status(statusCode).json(errorResponse);
 
