@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export interface PrismaFindManyArgs {
     where?: Record<string, unknown>;
@@ -21,4 +22,25 @@ export interface PrismaCountArgs {
     cursor?: Record<string, unknown>;
     distinct?: string[] | string;
     [key: string]: unknown;
+}
+
+export interface PrismaDelegate{
+    findMany(args?: any): Promise<any[]>;
+    count(args?: any): Promise<number>;
+}
+
+export interface IQueryParams{
+    searchTerm?: string;
+    page?: string;
+    limit?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    fields?: string;
+    includes?: string; 
+    [key: string]: string | undefined;
+}
+
+export interface IQueryConfig {
+    searchableFields?: string[];
+    filterableFields?: string[];
 }
