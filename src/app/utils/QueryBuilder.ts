@@ -1,3 +1,5 @@
+import { Keys } from './../../generated/prisma/internal/prismaNamespace';
+import { object } from "zod"
 import { Prisma } from "../../generated/prisma/browser"
 import { IQueryConfig, IQueryParams, PrismaCountArgs, PrismaDelegate, PrismaFindManyArgs, PrismaQueryFilter, PrismaStringFilter, PrismaWhereConditions } from "../interfaces/query.interface"
 
@@ -13,7 +15,7 @@ export class QueryBuilder<
     private skip: number = 0
     private sortBy: string = 'createdAt'
     private sortOrder: 'asc' | 'desc' = 'desc'
-    private selectFields: Record<string, boolean | undefined>
+    private selectFields: Record<string, boolean | undefined | Record<string, unknown>> = {}
 
     constructor(
         private model: PrismaDelegate,
@@ -85,7 +87,71 @@ export class QueryBuilder<
                 countWhereConditions.OR = searchConditions
             }
 
-            return this; 
+            return this;
+        }
+        filter(): this{
+            const { filterableFields } = this.config
+            const excludeFields = ['page', 'limit', 'sortBy', 'sortOrder', 'searchTerm', 'include', 'fields']
+
+            const filterParams: Record<string, unknown> = {}
+            object.Keys(this.queryParams).forEach((key) => {
+                if (!excludeFields.includes(key)) {
+                    filterParams[key] = this.queryParams[key]
+                }
+            })
+
+            const queryWhere = this.query.where as Record<string, unknown>
+            const countQueryWhere = this.countQuery.where as Record<string, unknown>
+
+            object.Keys(filterParams).forEach((key) => {
+                const value = filterParams[key]
+                if(value===undefined || value === "" ){
+                    return 
+                }
+                const isAllowedField = !filterableFields || filterableFields.length === 0 || filterableFields.includes(key)
+                if(!isAllowedField){
+                    return 
+                }
+
+                if(key.includes('.')){
+                    const parts = key.split('.')
+
+                    if(parts.length === 2){ 
+                        const [relation, nestedField] = parts
+                        queryWhere[relation] = {
+                            [nestedField]: value
+                        }
+
+                        countQueryWhere[relation] = {
+                            [nestedField]: value
+                        }
+                    }
+                    else if(parts.length === 3){
+                        const [relation, nestedRelation, nestedField] = parts
+                        queryWhere[relation] = {
+                            [nestedRelation]: {
+                                [nestedField]: value
+                            }
+                        }
+
+                        countWhere[relation] = {
+                            [nestedRelation]: {
+                                [nestedField]: value
+                            }
+                        }
+                    }
+                    else{
+                        queryWhere[key] = value
+                        countQueryWhere[key] = value
+                    }
+                }
+                else{
+                    queryWhere[key] = value; 
+                    countQueryWhere[key] = value; 
+                }
+                
+            })
+            return this
         }
     }
 }
