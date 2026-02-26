@@ -15,7 +15,9 @@ router.post("/",
     multerUpload.single('file'),
     validateRequest(SpecialtyValidation.createSpecialtyZodSchema),
     SpecialtyController.createSpecialty)
-router.get("/", checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.DOCTOR), SpecialtyController.getAllSpecialty)
+router.get("/",
+    // checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.DOCTOR),
+    SpecialtyController.getAllSpecialty)
 router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialtyController.deleteSpecialty)
 router.patch("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialtyController.updateSpecialty)
 
