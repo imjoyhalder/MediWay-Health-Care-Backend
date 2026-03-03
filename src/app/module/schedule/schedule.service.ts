@@ -1,7 +1,6 @@
 import { add, addHours, addMinutes, format } from "date-fns";
 import { ICreateSchedulePayload } from "./schedule.interface";
 import { convertDateTime } from "./schedule.utils";
-import { int } from "zod";
 import { prisma } from "../../lib/prisma";
 
 
@@ -63,4 +62,46 @@ const createSchedule = async (payload: ICreateSchedulePayload) => {
         startDateTime.setDate()
 
     }
+}
+
+const getAllSchedules = async () => {
+    const schedules = await prisma.schedule.findMany();
+    return schedules;
+}
+
+const getScheduleById = async (id: string) => {
+    const schedule = await prisma.schedule.findUnique({
+        where: {
+            id
+        }
+    })
+    return schedule;
+}
+
+const updateSchedule = async (id: string) => {
+    const schedule = await prisma.schedule.update({
+        where: {
+            id
+        }, 
+        data: {}
+    })
+    return schedule;
+}
+
+const deleteSchedule = async (id: string) => {
+    const schedule = await prisma.schedule.delete({
+        where: {
+            id
+        }
+    })
+    return schedule;
+}
+
+
+export const ScheduleService = {
+    createSchedule, 
+    getAllSchedules,
+    getScheduleById,
+    updateSchedule,
+    deleteSchedule
 }
