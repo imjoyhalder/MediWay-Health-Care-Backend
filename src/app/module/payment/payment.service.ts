@@ -1,13 +1,13 @@
 import Stripe from "stripe";
 import { prisma } from "../../lib/prisma";
-import { env } from "node:process";
+
 import { PaymentStatus } from "../../../generated/prisma/enums";
 
 const handleStripeWebhookEvent = async (event: Stripe.Event) => {
 
     const existingPayment = await prisma.payment.findUnique({
         where: {
-            id: event.id
+            stripeEventId: event.id
         }
     });
 
@@ -51,18 +51,40 @@ const handleStripeWebhookEvent = async (event: Stripe.Event) => {
 
                 await tx.payment.update({
                     where: {
-                        id: paymentId
+                        stripeEventId: paymentId
                     },
                     data: {
                         status: session.payment_status === 'paid'? PaymentStatus.PAID : PaymentStatus.UNPAID,
-                    }
-                })
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        paymentGatewayData: session as any
+                    }   
+                }); 
             })
+
+            console.log(`processed checkout session completed for appointment ${appointmentId} and payment ${paymentId}`);
+            break; 
         }
-        case 'checkout.session.expired':{}
-        case 'payment_intent.payment_failed':{}
+        case 'checkout.session.expired':{
+            const session = event.data.object as Stripe.Checkout.Session;
+            
+            console.log(`CheckOut session ${session.id} expired. Marking associated payment as failed. `);
+            break; 
+            
+        }
+        case 'payment_intent.payment_failed':{
+            const session = event.data.object as Stripe.PaymentIntent;
+            
+            console.log(`Payment Intent ${session.id} failed. Marking associated payment as failed. `);
+            break;
+        }
         default:
             console.log("Unhandled type ", event.type);
 
     }
+
+    return {message: `webhook event ${event.id} processed successfully`};
+}
+
+export const PaymentService = {
+    handleStripeWebhookEvent
 }
