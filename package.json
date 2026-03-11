@@ -13,7 +13,8 @@
     "generate": "npx prisma generate",
     "studio": "npx prisma studio",
     "push": "npx prisma db push",
-    "pull": "npx prisma db pull"
+    "pull": "npx prisma db pull", 
+    "stripe:webhook":"stripe listen --forward-to localhost:5000/webhook"
   },
   "repository": {
     "type": "git",
