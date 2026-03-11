@@ -1,76 +1,87 @@
+import { Request, Response } from "express";
 import status from "http-status";
+import { IQueryParams } from "../../interfaces/query.interface";
 import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
-import { Request, Response } from "express";
-import { ScheduleService } from "../schedule/schedule.service";
+import { DoctorScheduleService } from "./doctorSchedule.service";
+import { IRequestUser } from "../../interfaces/requestUser.interface";
 
-const createDoctorSchedule = catchAsync((req: Request, res: Response) => {
-    const schedule =  ScheduleService.createDoctorSchedule();
+const createMyDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
+    const payload = req.body;
+    const user = req.user;
+    const doctorSchedule = await DoctorScheduleService.createMyDoctorSchedule(user as IRequestUser, payload);
     sendResponse(res, {
         success: true,
-        httpStatusCode: status.CREATED, 
-        message: "Schedule created successfully",
-        data: schedule  
-    })
+        httpStatusCode: status.CREATED,
+        message: 'Doctor schedule created successfully',
+        data: doctorSchedule
+    });
 });
 
-const getMyDoctorSchedule = catchAsync((req: Request, res: Response) => {
-    const { id } = req.params;
-    const schedule =  ScheduleService.getMyDoctorSchedule(id);
+const getMyDoctorSchedules = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const query = req.query;
+    const result = await DoctorScheduleService.getMyDoctorSchedules(user as IRequestUser, query as IQueryParams);
     sendResponse(res, {
         success: true,
-        httpStatusCode: status.OK, 
-        message: "Schedule fetched successfully",
-        data: schedule  
-    })
+        httpStatusCode: status.OK,
+        message: 'Doctor schedules retrieved successfully',
+        data: result.data,
+        meta: result.meta
+    });
 });
 
-const getAllDoctorSchedules = catchAsync((req: Request, res: Response) => {
-    const schedules =  ScheduleService.getAllDoctorSchedules();
+const getAllDoctorSchedules = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const result = await DoctorScheduleService.getAllDoctorSchedules(query as IQueryParams);
     sendResponse(res, {
         success: true,
-        httpStatusCode: status.OK, 
-        message: "Schedules fetched successfully",
-        data: schedules  
-    })
+        httpStatusCode: status.OK,
+        message: 'All doctor schedules retrieved successfully',
+        data: result.data,
+        meta: result.meta
+    });
 });
 
-const getDoctorScheduleById = catchAsync((req: Request, res: Response) => {
-    const { id } = req.params;
-    const schedule =  ScheduleService.getDoctorScheduleById(id);
+const getDoctorScheduleById = catchAsync(async (req: Request, res: Response) => {
+    const doctorId = req.params.doctorId;
+    const scheduleId = req.params.scheduleId;
+    const doctorSchedule = await DoctorScheduleService.getDoctorScheduleById(doctorId as string, scheduleId as string);
     sendResponse(res, {
         success: true,
-        httpStatusCode: status.OK, 
-        message: "Schedule fetched successfully",
-        data: schedule  
-    })
+        httpStatusCode: status.OK,
+        message: 'Doctor schedule retrieved successfully',
+        data: doctorSchedule
+    });
 });
 
-const updateMyDoctorSchedule = catchAsync((req: Request, res: Response) => {
-    const { id } = req.params;
-    const schedule =  ScheduleService.updateMyDoctorSchedule(id);
+const updateMyDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
+    const payload = req.body;
+    const user = req.user;
+    const updatedDoctorSchedule = await DoctorScheduleService.updateMyDoctorSchedule(user as IRequestUser, payload);
     sendResponse(res, {
         success: true,
-        httpStatusCode: status.OK, 
-        message: "Schedule updated successfully",
-        data: schedule  
-    })
+        httpStatusCode: status.OK,
+        message: 'Doctor schedule updated successfully',
+        data: updatedDoctorSchedule
+    });
 });
 
-const deleteMyDoctorSchedule = catchAsync((req: Request, res: Response) => {
-    const { id } = req.params;
-    const schedule =  ScheduleService.deleteMyDoctorSchedule(id);
+const deleteMyDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const user = req.user;
+    await DoctorScheduleService.deleteMyDoctorSchedule(id as string, user as IRequestUser);
     sendResponse(res, {
         success: true,
-        httpStatusCode: status.OK, 
-        message: "Schedule deleted successfully",
-        data: schedule  
-    })
+        httpStatusCode: status.OK,
+        message: 'Doctor schedule deleted successfully',
+    });
 });
+
 
 export const DoctorScheduleController = {
-    createDoctorSchedule,
-    getMyDoctorSchedule,
+    createMyDoctorSchedule,
+    getMyDoctorSchedules,
     getAllDoctorSchedules,
     getDoctorScheduleById,
     updateMyDoctorSchedule,
