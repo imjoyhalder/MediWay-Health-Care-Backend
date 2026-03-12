@@ -11,6 +11,8 @@ import cors from "cors";
 import { envVars } from "./config/env";
 import qs from "qs";
 import { PaymentController } from "./app/module/payment/payment.controller";
+import cron from 'node-cron';
+import { AppointmentService } from "./app/module/appointment/appointment.service";
 
 const app: Application = express();
 
@@ -37,6 +39,15 @@ app.use('/api/auth', toNodeHandler(auth))
 
 
 app.use(express.urlencoded({ extended: true }));
+
+cron.schedule(" */25 * * * *", async () => {
+    try {
+        console.log("unpaid appointments cancel function running");
+        await AppointmentService.cancelUnpaidAppointments()
+    } catch (error) {
+        console.log("Error canceling unpaid appointments", error);
+    }
+});
 
 // Middleware to parse JSON bodies
 app.use(express.json());
