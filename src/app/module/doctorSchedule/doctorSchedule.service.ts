@@ -1,3 +1,4 @@
+import status from "http-status";
 import { DoctorSchedules, Prisma } from "../../../generated/prisma/client";
 import { IQueryParams } from "../../interfaces/query.interface";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
@@ -5,6 +6,7 @@ import { prisma } from "../../lib/prisma";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { doctorScheduleFilterableFields, doctorScheduleIncludeConfig, doctorScheduleSearchableFields } from "./doctorSchedule.constant";
 import { ICreateDoctorSchedulePayload, IUpdateDoctorSchedulePayload } from "./doctorSchedule.interface";
+import AppError from "../../errorHelpers/AppError";
 
 const createMyDoctorSchedule = async (user: IRequestUser, payload: ICreateDoctorSchedulePayload) => {
     const doctorData = await prisma.doctor.findUniqueOrThrow({
@@ -150,6 +152,19 @@ const deleteMyDoctorSchedule = async (id: string, user: IRequestUser) => {
             email: user.email
         }
     });
+
+    const doctorScheduleExists = await prisma.doctorSchedules.findUnique({
+        where: {
+            doctorId_scheduleId: {
+                doctorId: doctorData.id,
+                scheduleId: id
+            }
+        }
+    });
+
+    if (!doctorScheduleExists) {
+        throw new AppError(status.NOT_FOUND, "Schedule not found")
+    }
 
     await prisma.doctorSchedules.deleteMany({
         where: {
