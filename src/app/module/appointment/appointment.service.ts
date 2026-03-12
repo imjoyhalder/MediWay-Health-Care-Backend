@@ -393,6 +393,7 @@ const initiatePayment = async (appointmentId: string, user: IRequestUser) => {
     }
 }
 
+// cancel unpaid appointments
 const cancelUnpaidAppointments = async () => {
     const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
