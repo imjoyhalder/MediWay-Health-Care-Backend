@@ -34,7 +34,9 @@ interface EnvConfig {
     STRIPE: {
         STRIPE_SECRET_KEY: string;
         STRIPE_WEBHOOK_SECRET: string;
-    }
+    }, 
+    SUPPER_ADMIN_EMAIL: string, 
+    SUPPER_ADMIN_PASSWORD: string
 
 }
 
@@ -65,7 +67,9 @@ const loadEnvVariables = (): EnvConfig => {
         "CLOUDINARY_API_KEY",
         "CLOUDINARY_API_SECRET",
         "STRIPE_SECRET_KEY",
-        "STRIPE_WEBHOOK_SECRET"
+        "STRIPE_WEBHOOK_SECRET", 
+        "SUPPER_ADMIN_EMAIL", 
+        "SUPPER_ADMIN_PASSWORD"
     ];
 
     for (const varName of requireVariables) {
@@ -104,6 +108,8 @@ const loadEnvVariables = (): EnvConfig => {
             STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
             STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
         },
+        SUPPER_ADMIN_EMAIL: process.env.SUPPER_ADMIN_EMAIL as string,
+        SUPPER_ADMIN_PASSWORD: process.env.SUPPER_ADMIN_PASSWORD as string
     };
 };
 
