@@ -2,7 +2,7 @@ import { BloodGroup, Gender } from "../../../generated/prisma/enums";
 
 export interface IUpdatePatientInfoPayload {
     name?: string;
-    profile?: string;
+    profilePhoto?: string;
     contactNumber?: string;
     address?: string,
 }
