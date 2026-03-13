@@ -51,12 +51,14 @@ const handleStripeWebhookEvent = async (event: Stripe.Event) => {
 
                 await tx.payment.update({
                     where: {
-                        stripeEventId: paymentId
+                        // stripeEventId: paymentId
+                        id: paymentId
                     },
                     data: {
                         status: session.payment_status === 'paid'? PaymentStatus.PAID : PaymentStatus.UNPAID,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        paymentGatewayData: session as any
+                        paymentGatewayData: session as any,
+                        stripeEventId: event.id
                     }   
                 }); 
             })
@@ -88,3 +90,4 @@ const handleStripeWebhookEvent = async (event: Stripe.Event) => {
 export const PaymentService = {
     handleStripeWebhookEvent
 }
+

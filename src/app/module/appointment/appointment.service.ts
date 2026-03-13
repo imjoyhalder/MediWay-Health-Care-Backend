@@ -1,4 +1,7 @@
+
+
 import status from "http-status";
+// import { uuidv7 } from "zod/mini";
 import { v7 as uuidv7 } from "uuid";
 import { PaymentStatus, Role } from "../../../generated/prisma/enums";
 import AppError from "../../errorHelpers/AppError";
@@ -95,10 +98,10 @@ const bookAppointment = async (payload: IBookAppointmentPayload, user: IRequestU
                 paymentId: paymentData.id,
             },
 
-            success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success`,
+            success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success?appointment_id=${appointmentData.id}&payment_id=${paymentData.id}`,
 
             // cancel_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-failed`,
-            cancel_url: `${envVars.FRONTEND_URL}/dashboard/appointments`,
+            cancel_url: `${envVars.FRONTEND_URL}/dashboard/appointments?error=payment_cancelled`,
         })
 
         return {
@@ -393,7 +396,6 @@ const initiatePayment = async (appointmentId: string, user: IRequestUser) => {
     }
 }
 
-// cancel unpaid appointments
 const cancelUnpaidAppointments = async () => {
     const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
