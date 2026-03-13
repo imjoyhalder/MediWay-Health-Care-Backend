@@ -2,13 +2,13 @@ import z from "zod";
 import { BloodGroup, Gender } from "../../../generated/prisma/enums";
 
 const updatePatientProfileZodSchema = z.object({
-    patientInfo: z.object({
-        name: z.string("Name must be a string").min(1, "Name cannot be empty").max(100, "Name must be less than 100 characters").optional(),
-        profilePhoto: z.url("Profile photo must be a valid URL").optional(),
-        contactNumber: z.string("Contact number must be a string").min(1, "Contact number cannot be empty").max(20, "Contact number must be less than 20 characters").optional(),
-        address: z.string("Address must be a string").min(1, "Address cannot be empty").max(200, "Address must be less than 200 characters").optional(),
+    patientInfo : z.object({
+        name : z.string("Name must be a string").min(1, "Name cannot be empty").max(100, "Name must be less than 100 characters").optional(),
+        profilePhoto : z.url("Profile photo must be a valid URL").optional(),
+        contactNumber : z.string("Contact number must be a string").min(1, "Contact number cannot be empty").max(20, "Contact number must be less than 20 characters").optional(),
+        address : z.string("Address must be a string").min(1, "Address cannot be empty").max(200, "Address must be less than 200 characters").optional(),
     }).optional(),
-    patientHealthData: z.object({
+    patientHealthData : z.object({
         gender: z.enum([Gender.FEMALE, Gender.MALE, Gender.OTHER]).optional(),
         dateOfBirth: z.string().refine((date) => !isNaN(Date.parse(date)), {
             message: "Invalid date format",
@@ -28,41 +28,41 @@ const updatePatientProfileZodSchema = z.object({
         recentDepression: z.boolean().optional(),
         maritalStatus: z.string().optional(),
     }).optional(),
-    medicalReports: z.array(z.object({
-        shouldDelete: z.boolean().optional(),
-        reportId: z.uuid().optional(),
-        reportName: z.string().optional(),
-        reportLink: z.url().optional(),
+    medicalReports : z.array(z.object({
+        shouldDelete : z.boolean().optional(),
+        reportId : z.uuid().optional(),
+        reportName : z.string().optional(),
+        reportLink : z.url().optional(),
     })).optional().refine((reports) => {
-        if (!reports || reports.length === 0) return true; // If no reports, it's valid
+        if(!reports || reports.length === 0) return true; // If no reports, it's valid
 
-
+        
         for (const report of reports) {
 
             // case-1
-            if (report.shouldDelete === true && !report.reportId) {
+            if(report.shouldDelete === true && !report.reportId) {
                 return false; // If shouldDelete is true, reportId must be provided
             }
 
             // case-2
-            if (report.reportId && !report.shouldDelete) {
+            if(report.reportId && !report.shouldDelete) {
                 return false; // If reportId is provided, shouldDelete must be true
             }
 
             //case-3
-            if (report.reportName && !report.reportLink) {
+            if(report.reportName && !report.reportLink) {
                 return false; // If reportName is provided, reportLink must also be provided
             }
 
             //case-4
-            if (report.reportLink && !report.reportName) {
+            if(report.reportLink && !report.reportName) {
                 return false; // If reportLink is provided, reportName must also be provided
             }
 
             return true; // If none of the above conditions are violated, it's valid
         }
     }, {
-        message: "Invalid medical report data. If shouldDelete is true, reportId must be provided. If reportId is provided, shouldDelete must be true. If reportName is provided, reportLink must also be provided and vice versa."
+        message : "Invalid medical report data. If shouldDelete is true, reportId must be provided. If reportId is provided, shouldDelete must be true. If reportName is provided, reportLink must also be provided and vice versa."
     })
 })
 
