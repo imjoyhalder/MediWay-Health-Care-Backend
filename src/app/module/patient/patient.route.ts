@@ -6,7 +6,8 @@ import { validateRequest } from '../../middleware/validateRequest'
 import { PatientValidation } from './patient.validation'
 import { patientController } from './patient.controller'
 import { multerUpload } from '../../../config/multer.config'
-import { updateMyPatientProfileMiddleWare } from './patient.middleware'
+import { updateMyPatientProfileMiddleware } from './patient.middleware'
+
 
 const router = Router()
 
@@ -14,9 +15,9 @@ router.patch('/update-my-profile',
     checkAuth(Role.PATIENT),
     multerUpload.fields([
         { name: "profilePhoto", maxCount: 1 },
-        { name: "medicalReport", maxCount: 5 }
+        { name: "medicalReports", maxCount: 5 }
     ]),
-    updateMyPatientProfileMiddleWare,
+    updateMyPatientProfileMiddleware,
     validateRequest(PatientValidation.updatePatientProfileZodSchema),
     patientController.updateMyProfile
 )

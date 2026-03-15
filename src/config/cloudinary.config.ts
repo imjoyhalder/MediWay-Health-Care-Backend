@@ -1,12 +1,13 @@
-import {v2 as cloudinary, UploadApiResponse} from 'cloudinary';
-import AppError from '../app/errorHelpers/AppError';
-import status from 'http-status';
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import status from "http-status";
+import { envVars } from "./env";
+import AppError from "../app/errorHelpers/AppError";
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+    cloud_name: envVars.CLOUDINARY.CLOUDINARY_CLOUD_NAME,
+    api_key: envVars.CLOUDINARY.CLOUDINARY_API_KEY,
+    api_secret: envVars.CLOUDINARY.CLOUDINARY_API_SECRET,
+})
 
 export const uploadFileToCloudinary = async (
     buffer : Buffer,
@@ -42,8 +43,8 @@ export const uploadFileToCloudinary = async (
         cloudinary.uploader.upload_stream(
             {
                 resource_type: "auto",
-                public_id: `mediway-healthcare/${folder}/${uniqueName}`,
-                folder : `mediway-healthcare/${folder}`,
+                public_id: `ph-healthcare/${folder}/${uniqueName}`,
+                folder : `ph-healthcare/${folder}`,
             },
             (error, result) => {
                 if(error){
@@ -82,4 +83,5 @@ export const deleteFileFromCloudinary = async (url : string) => {
     }
 }
 
-export const cloudinaryUpload = cloudinary; 
+
+export const cloudinaryUpload = cloudinary;
