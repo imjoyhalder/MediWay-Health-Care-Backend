@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { IUpdatePatientProfilePayload } from './patient.interface'
 
-export const updateMyProfileMiddleWare = async (req: Request, res: Response, next: NextFunction) => {
+export const updateMyPatientProfileMiddleWare = async (req: Request, res: Response, next: NextFunction) => {
     const payload: IUpdatePatientProfilePayload = req.body;
     const files = req.files as { [fieldName: string]: Express.Multer.File[] | undefined }
 
