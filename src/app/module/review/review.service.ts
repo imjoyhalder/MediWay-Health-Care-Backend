@@ -1,9 +1,10 @@
 import status from "http-status";
-import { PaymentStatus } from "../../../generated/prisma/enums";
+import { PaymentStatus, Role } from "../../../generated/prisma/enums";
 import AppError from "../../errorHelpers/AppError";
 import { IRequestUser } from "../../interfaces/requestUser.interface"
 import { prisma } from "../../lib/prisma";
 import { ICreateReviewPayload } from './review.interface';
+
 
 
 const giveReview = async (user: IRequestUser, payload: ICreateReviewPayload) => {
@@ -88,11 +89,63 @@ const getAllReviews = async () => {
     //     }
     // })
 
-    return reviews; 
+    return reviews;
 }
 
-const myReviews = async () => {
-    return true
+
+const myReviews = async (user: IRequestUser) => {
+
+    const isUserExists = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: user.email
+        }
+    })
+
+    if (!isUserExists) {
+        throw new AppError(status.NOT_FOUND, "User not found");
+    }
+
+    if(user.role === Role.DOCTOR) {
+        const doctorData = await prisma.doctor.findUniqueOrThrow({
+            where: {
+                email: user.email
+            }
+        })
+
+        const reviews = await prisma.review.findMany({
+            where: {
+                doctorId: doctorData.id
+            },
+            include: {
+                patient: true,
+                appointment: true
+            }
+        })
+        return reviews;
+    }
+
+    if (user.role === Role.PATIENT) {
+
+        const patient = await prisma.patient.findUniqueOrThrow({
+            where: {
+                email: user.email
+            }
+        })
+
+        const reviews = await prisma.review.findMany({
+            where: {
+                patientId: patient.id
+            },
+            include: {
+                doctor: true,
+                appointment: true
+            }
+        })
+        return reviews;
+    }
+
+
+
 }
 
 const updateReview = async () => {
