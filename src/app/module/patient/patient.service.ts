@@ -71,7 +71,19 @@ const updateMyProfile = async (user: IRequestUser, payload: IUpdatePatientProfil
 
         if (payload.medicalReports && Array.isArray(payload.medicalReports) && payload.medicalReports.length > 0) {
             for (const report of payload.medicalReports) {
+
                 if (report.shouldDelete && report.reportId) {
+
+                    const reportIsExists = await tx.medicalReport.findUnique({
+                        where: {
+                            id: report.reportId
+                        }
+                    });
+
+                    if (!reportIsExists) {
+                        throw new Error("Report not found");
+                    }
+
                     const deletedReport = await tx.medicalReport.delete({
                         where: {
                             id: report.reportId,
