@@ -1,5 +1,7 @@
 
+import status from "http-status";
 import { deleteFileFromCloudinary } from "../../../config/cloudinary.config";
+import AppError from "../../errorHelpers/AppError";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
 import { prisma } from "../../lib/prisma";
 import { IUpdatePatientHealthDataPayload, IUpdatePatientProfilePayload } from "./patient.interface";
@@ -81,7 +83,7 @@ const updateMyProfile = async (user: IRequestUser, payload: IUpdatePatientProfil
                     });
 
                     if (!reportIsExists) {
-                        throw new Error("Report not found");
+                        throw new AppError(status.NOT_FOUND, "Report not found");
                     }
 
                     const deletedReport = await tx.medicalReport.delete({
