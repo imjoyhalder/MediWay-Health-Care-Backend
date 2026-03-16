@@ -71,7 +71,24 @@ const giveReview = async (user: IRequestUser, payload: ICreateReviewPayload) => 
 }
 
 const getAllReviews = async () => {
-    return true
+    const reviews = await prisma.review.findMany({
+        include: {
+            doctor: true,
+            patient: true,
+            appointment: true
+        }
+    })
+    // return ({
+    //     data: reviews,
+    //     meta: {
+    //         total: reviews.length,
+    //         page: 1,
+    //         limit: reviews.length,
+    //         totalPages: Math.ceil(total / limit)
+    //     }
+    // })
+
+    return reviews; 
 }
 
 const myReviews = async () => {

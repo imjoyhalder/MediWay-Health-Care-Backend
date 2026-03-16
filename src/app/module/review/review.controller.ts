@@ -20,14 +20,12 @@ const giveReview = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllReviews = catchAsync(async (req: Request, res: Response) => {
-    const query = req.query;
-    const result = await ReviewService.getAllReviews(query);
+    const result = await ReviewService.getAllReviews();
     sendResponse(res, {
         httpStatusCode: status.OK,
         success: true,
         message: "Reviews retrieved successfully",
-        data: result.data,
-        meta: result.meta
+        data: result,
     })
 })
 
