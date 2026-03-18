@@ -1911,6 +1911,7 @@ export const PrescriptionScalarFieldEnum = {
   id: 'id',
   followUpDate: 'followUpDate',
   instructions: 'instructions',
+  pdfUrl: 'pdfUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   appointmentId: 'appointmentId',
