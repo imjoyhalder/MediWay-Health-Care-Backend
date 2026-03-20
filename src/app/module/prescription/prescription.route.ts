@@ -39,5 +39,5 @@ router.delete(
     PrescriptionController.deletePrescription
 )
 
-
+// prescription route
 export const PrescriptionRoutes = router;
