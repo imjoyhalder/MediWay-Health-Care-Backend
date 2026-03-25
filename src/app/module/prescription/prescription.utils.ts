@@ -35,8 +35,7 @@ export const generatePrescriptionPDF = async (prescriptionData: PrescriptionData
             doc.on('error', (error) => {
                 reject(error);
             });
-
-            // Title
+            
             doc.fontSize(24).font('Helvetica-Bold').text('PRESCRIPTION', {
                 align: 'center',
             });
